@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import urllib2
+import urllib2, urlparse
 from paypal.standard.models import PayPalStandardBase
 from paypal.standard.ipn.signals import *
 
@@ -20,11 +20,22 @@ class PayPalIPN(PayPalStandardBase):
     def _verify_postback(self):
         if self.response != "VERIFIED":
             self.set_flag("Invalid postback. (%s)" % self.response)
-            
+    
+    def is_masspayment(self):
+        return self.txn_type == "mass_pay"
+    
+    def is_adaptivepayment(self):
+        self.txt_type == "adaptive_pay"
+    
     def send_signals(self):
         """Shout for the world to hear whether a txn was successful."""
         # Transaction signals:
-        if self.is_transaction():
+        if self.is_masspayment():
+            masspayment_was_successful.send(sender=self)
+        elif self.is_adaptivepayment():
+            adaptivepayment_was_successful.send(sender=self)
+        
+        elif self.is_transaction():
             if self.flag:
                 payment_was_flagged.send(sender=self)
             else:
@@ -51,4 +62,15 @@ class PayPalIPN(PayPalStandardBase):
             elif self.is_subscription_end_of_term():
                 subscription_eot.send(sender=self)
             elif self.is_subscription_modified():
-                subscription_modify.send(sender=self)            
+                subscription_modify.send(sender=self)
+
+    def initialize(self, request):
+        """Store the data we'll need to make the postback from the request object."""
+        self.query = getattr(request, request.method).urlencode()
+
+        if not self.txn_type:
+            q = urlparse.parse_qs(self.query)
+            if q.get('pay_key', [''])[0]:
+                self.txn_type = "adaptive_pay"
+        self.ipaddress = request.META.get('REMOTE_ADDR', '')
+

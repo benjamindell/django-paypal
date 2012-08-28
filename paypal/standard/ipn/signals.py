@@ -6,6 +6,12 @@ http://code.djangoproject.com/wiki/Signals#Helppost_saveseemstobeemittedtwicefor
 """
 from django.dispatch import Signal
 
+# Sent when a mass payment is successfully processed.
+masspayment_was_successful = Signal()
+
+# Sent when a adaptive payment is successfully processed.
+adaptivepayment_was_successful = Signal()
+
 # Sent when a payment is successfully processed.
 payment_was_successful = Signal()
 
