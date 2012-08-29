@@ -59,3 +59,22 @@ def ipn(request, item_check_callable=None):
 
     ipn_obj.save()
     return HttpResponse("OKAY")
+
+
+@require_POST
+@csrf_exempt
+def ap_ipn(request, item_check_callable=None):
+    ipn_obj = None
+    
+    # Clean up the data as PayPal sends some weird values such as "N/A"
+    data = request.POST.copy()
+    date_fields = ('time_created', 'payment_date', 'next_payment_date',
+                   'subscr_date', 'subscr_effective')
+    for date_field in date_fields:
+        if data.get(date_field) == 'N/A':
+            del data[date_field]
+
+    ipn_obj = PayPalIPN()    
+    ipn_obj.initialize_adaptive_payment(request)
+
+    return HttpResponse("OKAY")

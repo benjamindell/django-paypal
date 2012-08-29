@@ -25,7 +25,7 @@ class PayPalIPN(PayPalStandardBase):
         return self.txn_type == "mass_pay"
     
     def is_adaptivepayment(self):
-        self.txt_type == "adaptive_pay"
+        return self.txt_type == "adaptive_pay"
     
     def send_signals(self):
         """Shout for the world to hear whether a txn was successful."""
@@ -64,13 +64,17 @@ class PayPalIPN(PayPalStandardBase):
             elif self.is_subscription_modified():
                 subscription_modify.send(sender=self)
 
-    def initialize(self, request):
-        """Store the data we'll need to make the postback from the request object."""
-        self.query = getattr(request, request.method).urlencode()
 
-        if not self.txn_type:
-            q = urlparse.parse_qs(self.query)
-            if q.get('pay_key', [''])[0]:
-                self.txn_type = "adaptive_pay"
-        self.ipaddress = request.META.get('REMOTE_ADDR', '')
+    def initialize_adaptive_payment(self, request):
+        self.initialize(request)
 
+        q = urlparse.parse_qs(self.query)
+        pay_key = q.get('pay_key', [''])[0]
+        if not pay_key:
+            self.set_flag('No AdaptivePayment PayKey')
+
+        self.txn_id = pay_key
+        self.txn_type = "adaptive_pay"
+        
+        self.save()
+        adaptivepayment_was_successful.send(sender=self)

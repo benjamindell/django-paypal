@@ -14,6 +14,16 @@ RECEIVER_EMAIL = settings.PAYPAL_RECEIVER_EMAIL
 POSTBACK_ENDPOINT = "https://www.paypal.com/cgi-bin/webscr"
 SANDBOX_POSTBACK_ENDPOINT = "https://www.sandbox.paypal.com/cgi-bin/webscr"
 
+MASSPAYMENT_POSTBACK_ENDPOINT = "https://api-3t.paypal.com/nvp"
+MASSPAYMENT_SANDBOX_POSTBACK_ENDPOINT = "https://api-3t.sandbox.paypal.com/nvp"
+
+SVCS_ENDPOINT = "svcs.paypal.com"
+SANDBOX_SVCS_ENDPOINT = "svcs.sandbox.paypal.com"
+
+ADAPTIVEPAYMENT_POSTBACK_ENDPOINT = "https://www.paypal.com/webscr"
+ADAPTIVEPAYMENT_SANDBOX_POSTBACK_ENDPOINT = "https://www.sandbox.paypal.com/webscr"
+
+
 # Images
 IMAGE = getattr(settings, "PAYPAL_IMAGE", "http://images.paypal.com/images/x-click-but01.gif")
 SUBSCRIPTION_IMAGE = getattr(settings, "PAYPAL_SUBSCRIPTION_IMAGE", "https://www.paypal.com/en_US/i/btn/btn_subscribeCC_LG.gif")
