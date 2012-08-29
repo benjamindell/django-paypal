@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from models import MassPayment, MassPaymentReceiver
 from paypal.standard.conf import *
 
 import datetime, httplib2, urllib, httplib
@@ -22,19 +21,7 @@ def mass_payment(options):
         'notify_url': options['notify_url'],
     }
     
-    payment = MassPayment.objects.create(
-        sender_email = settings.PAYPAL_RECEIVER_EMAIL,
-        currency_code = options['currencyCode'],
-        memo = 'Payment on %s' % datetime.datetime.now(),
-    )
-    
-    
-    for index, receiver in enumerate(options['receivers']):
-        payment.receivers.create(
-            email = receiver['email'],
-            amount = receiver['amount'],
-        )
-        
+    for index, receiver in enumerate(options['receivers']):        
         data['L_EMAIL%s' % index] = receiver['email']
         data['L_AMT%s' % index] = receiver['amount']
         data['L_UNIQUEID%s' % index] = receiver['unique_id']
