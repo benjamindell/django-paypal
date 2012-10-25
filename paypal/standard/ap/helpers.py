@@ -78,7 +78,7 @@ def adaptive_payment(options):
     conn.close()
     
     if not paykey:
-        sys.stderr.write('\nPayPal Error: \n%s\n\n' % data)
+        sys.stderr.write('\nPayPal Error: \n%s\n--\nHeaders:\n %s \n\n' % (data, params))
         sys.stderr.flush()
     
     return { 'paykey': paykey, }
