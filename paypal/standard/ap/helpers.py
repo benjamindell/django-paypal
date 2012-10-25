@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 
 from paypal.standard.conf import *
 
-import datetime, httplib2, urllib, httplib
+import sys, datetime, httplib2, urllib, httplib
 from urllib import urlencode
 import urlparse
 from ordereddict import OrderedDict
@@ -77,4 +77,9 @@ def adaptive_payment(options):
     paykey = data.get('payKey', [None])[0]     
     conn.close()
     
+    if not paykey:
+        sys.stderr.write('\nPayPal Error: \n%s\n\n' % data)
+        sys.stderr.flush()
+    
     return { 'paykey': paykey, }
+
