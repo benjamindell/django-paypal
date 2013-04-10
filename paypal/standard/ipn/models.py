@@ -78,3 +78,4 @@ class PayPalIPN(PayPalStandardBase):
         self.txn_type = "adaptive_pay"
         
         self.save()
+        adaptivepayment_was_successful.send(sender=self)
