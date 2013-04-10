@@ -25,10 +25,11 @@ class PayPalIPN(PayPalStandardBase):
         return self.txn_type == "mass_pay"
     
     def is_adaptivepayment(self):
-        return self.txt_type == "adaptive_pay"
+        return self.txn_type == "adaptive_pay"
     
     def send_signals(self):
         """Shout for the world to hear whether a txn was successful."""
+        
         # Transaction signals:
         if self.is_masspayment():
             masspayment_was_successful.send(sender=self)
@@ -77,4 +78,3 @@ class PayPalIPN(PayPalStandardBase):
         self.txn_type = "adaptive_pay"
         
         self.save()
-        adaptivepayment_was_successful.send(sender=self)
